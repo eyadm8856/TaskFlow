@@ -1,0 +1,172 @@
+/* Navbar CSS Module - Deep Navy Background (#1B2A4A), Baby Blue Logo & Text (#A2C2E8) */
+
+.navHeader {
+  background-color: #1B2A4A !important;
+  border-bottom: 1px solid rgba(162, 194, 232, 0.25);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 4px 14px rgba(10, 18, 34, 0.35);
+}
+
+:global([data-theme="dark"]) .navHeader {
+  background-color: #121D34 !important;
+  border-bottom: 1px solid rgba(162, 194, 232, 0.2);
+}
+
+.navContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  gap: 1.5rem;
+}
+
+.brandGroup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Burger Button */
+.burgerBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background-color: rgba(162, 194, 232, 0.12);
+  border: 1px solid rgba(162, 194, 232, 0.4);
+  border-radius: var(--radius-sm, 6px);
+  color: #A2C2E8;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.burgerBtn:hover {
+  background-color: rgba(162, 194, 232, 0.22);
+  border-color: #A2C2E8;
+  color: #FFFFFF;
+}
+
+/* Brand Logo in Baby Blue (#A2C2E8) */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #A2C2E8 !important;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+  transition: opacity var(--transition-normal);
+}
+
+.logo:hover {
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+.logoIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background-color: rgba(162, 194, 232, 0.15);
+  border: 2px solid #A2C2E8;
+  color: #A2C2E8 !important;
+  border-radius: var(--radius-sm, 6px);
+  font-size: 0.95rem;
+  font-weight: 800;
+  box-shadow: 0 0 10px rgba(162, 194, 232, 0.25);
+}
+
+.actionsGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+/* User Info in Baby Blue */
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 0.8125rem;
+  line-height: 1.25;
+}
+
+.userName {
+  font-weight: 700;
+  color: #A2C2E8 !important;
+}
+
+.userEmail {
+  color: #C8DCF5 !important;
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+/* Logout Button */
+.logoutBtn {
+  background-color: rgba(162, 194, 232, 0.1);
+  border: 1px solid rgba(162, 194, 232, 0.35);
+  color: #A2C2E8 !important;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.logoutBtn:hover {
+  background-color: rgba(162, 194, 232, 0.22);
+  border-color: #A2C2E8;
+  color: #FFFFFF !important;
+}
+
+.loginBtn {
+  color: #A2C2E8 !important;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+}
+
+.loginBtn:hover {
+  color: #FFFFFF !important;
+  background-color: rgba(162, 194, 232, 0.15);
+  text-decoration: none;
+}
+
+.registerBtn {
+  background-color: #A2C2E8 !important;
+  color: #1B2A4A !important;
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.registerBtn:hover {
+  background-color: #BFD8F7 !important;
+  color: #121D34 !important;
+  text-decoration: none;
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .navContainer {
+    height: 56px;
+  }
+
+  .userInfo {
+    display: none;
+  }
+}

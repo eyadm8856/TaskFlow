@@ -1,0 +1,109 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny all access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Users collection
+    // Stored fields: displayName, email, createdAt
+    match /users/{userId} {
+      // Authenticated users can view teammate names/emails for membership & assignments
+      allow get, list: if isAuthenticated();
+      // Only the user themselves can create or update their profile document
+      allow write: if isOwner(userId);
+    }
+
+    // Projects collection
+    match /projects/{projectId} {
+      function isProjectMember() {
+        return isAuthenticated() && (
+          (resource != null && 'memberIds' in resource.data && request.auth.uid in resource.data.memberIds)
+          || (resource != null && 'ownerId' in resource.data && resource.data.ownerId == request.auth.uid)
+        );
+      }
+
+      function isProjectOwner() {
+        return isAuthenticated() && resource != null && 'ownerId' in resource.data && resource.data.ownerId == request.auth.uid;
+      }
+
+      // Read single project if member or owner or document does not exist yet (404 handling)
+      allow get: if isAuthenticated() && (
+        resource == null
+        || ('memberIds' in resource.data && request.auth.uid in resource.data.memberIds)
+        || ('ownerId' in resource.data && resource.data.ownerId == request.auth.uid)
+      );
+
+      // List projects: must filter where memberIds array-contains auth.uid or ownerId == auth.uid
+      allow list: if isAuthenticated() && (
+        ('memberIds' in resource.data && request.auth.uid in resource.data.memberIds)
+        || ('ownerId' in resource.data && resource.data.ownerId == request.auth.uid)
+      );
+
+      // Create: user must be owner and included in initial memberIds
+      allow create: if isAuthenticated()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.auth.uid in request.resource.data.memberIds
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 3
+        && request.resource.data.name.size() <= 80;
+
+      // Update / Delete: Project owner only
+      allow update, delete: if isProjectOwner();
+
+      // Tasks subcollection
+      match /tasks/{taskId} {
+        function getProject() {
+          return get(/databases/$(database)/documents/projects/$(projectId));
+        }
+
+        function isMemberOfParent() {
+          return isAuthenticated() && (
+            (getProject().data != null && 'memberIds' in getProject().data && request.auth.uid in getProject().data.memberIds)
+            || (getProject().data != null && 'ownerId' in getProject().data && request.auth.uid == getProject().data.ownerId)
+          );
+        }
+
+        function isOwnerOfParent() {
+          return isAuthenticated() && getProject().data != null && 'ownerId' in getProject().data && request.auth.uid == getProject().data.ownerId;
+        }
+
+        // View: Accessible to project members
+        allow get, list: if isMemberOfParent();
+
+        // Create: Member or Owner, createdBy must equal own auth UID
+        allow create: if isMemberOfParent()
+          && request.resource.data.createdBy == request.auth.uid
+          && request.resource.data.title is string
+          && request.resource.data.title.size() >= 3
+          && request.resource.data.title.size() <= 120
+          && request.resource.data.status in ['todo', 'in_progress', 'done']
+          && request.resource.data.priority in ['low', 'medium', 'high']
+          && (!('assigneeId' in request.resource.data) || request.resource.data.assigneeId == null || request.resource.data.assigneeId in getProject().data.memberIds);
+
+        // Update: Owner can edit anything. Creator can edit. Assignee can edit. Ensure createdBy is immutable.
+        allow update: if isMemberOfParent() && (
+          isOwnerOfParent()
+          || (resource.data.createdBy == request.auth.uid)
+          || ('assigneeId' in resource.data && resource.data.assigneeId == request.auth.uid)
+        ) && request.resource.data.createdBy == resource.data.createdBy;
+
+        // Delete: Owner or the member who created the task
+        allow delete: if isMemberOfParent() && (
+          isOwnerOfParent()
+          || resource.data.createdBy == request.auth.uid
+        );
+      }
+    }
+  }
+}

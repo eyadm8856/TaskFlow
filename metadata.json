@@ -1,0 +1,6 @@
+{
+  "name": "TaskFlow",
+  "description": "A responsive project & task management web app for small software teams.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
